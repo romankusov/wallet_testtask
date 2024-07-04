@@ -1,0 +1,29 @@
+spring:
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: password
+    url: jdbc:postgresql://127.0.0.1:5432/wallets
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        order_inserts: true
+        jdbc:
+          batch_size: 50
+        show_sql: true
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  application:
+    name: wallet
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate:
+      SQL: DEBUG
+server:
+  port: 8081

@@ -1,0 +1,7 @@
+#spring:
+#  application:
+#    name: wallet
+#  cloud:
+#    config:
+#      uri: http://localhost:8191
+#      fail-fast: true
