@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import java.util.UUID;
 
@@ -22,12 +23,12 @@ public class WalletController {
     private final WalletService walletService;
 
     @GetMapping("/wallets/{walletUUID}")
-    public ResponseEntity<WalletResponseDTO> getWalletByUUID(@PathVariable UUID walletUUID) {
+    public ResponseEntity<WalletResponseDTO> getWalletByUUID(@PathVariable @Valid UUID walletUUID) {
         return ResponseEntity.ok(walletService.getWalletByUUID(walletUUID));
     }
 
     @PostMapping("/wallet")
-    public void postTransferMoney(@RequestBody WalletTransferRequestDTO walletTransferRequestDTO) {
+    public void postTransferMoney(@RequestBody @Valid WalletTransferRequestDTO walletTransferRequestDTO) {
         walletService.postTransferMoney(walletTransferRequestDTO);
     }
 }

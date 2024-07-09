@@ -77,8 +77,8 @@ class WalletControllerTest {
     void testOkGetWalletByUUID() throws Exception {
         //given
         WalletResponseDTO walletResponseDTO = WalletResponseDTO.builder()
-                .uuid(uuid).
-                walletHolder(walletHolderName)
+                .uuid(uuid)
+                .walletHolder(walletHolderName)
                 .balance(balance)
                 .build();
 

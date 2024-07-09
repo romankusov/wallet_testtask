@@ -25,7 +25,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletResponseDTO getWalletByUUID(UUID walletUUID) {
         log.info("Получение из БД кошелька с id {}", walletUUID);
-        return walletRepository.findById(walletUUID).map(this::mapToDto).orElseThrow(() ->
+        return walletRepository.findByUUID(walletUUID).map(this::mapToDto).orElseThrow(() ->
                 new NotFoundException("Кошелек с id " + walletUUID + " не найден"));
     }
 
@@ -36,30 +36,22 @@ public class WalletServiceImpl implements WalletService {
         Wallet wallet = walletRepository.findById(walletTransferRequestDTO.getId()).orElseThrow(() ->
                 new NotFoundException("Кошелек с id " + walletTransferRequestDTO.getId() + " не найден"));
         BigDecimal amount = walletTransferRequestDTO.getAmount();
+        BigDecimal newBalance = null;
 
         if (walletTransferRequestDTO.getOperationType() == OperationType.DEPOSIT) {
-            log.info("Зачисление средств в размере {} на кошелек с id {}", amount, wallet.getId());
-            depositMoney(wallet, amount);
+            log.info("Расчет баланса после зачисления {} на кошелек с id {}", amount, wallet.getId());
+            newBalance = wallet.getBalance().add(amount);
         }
         if (walletTransferRequestDTO.getOperationType() == OperationType.WITHDRAW) {
             if (walletTransferRequestDTO.getAmount().compareTo(wallet.getBalance()) > 0) {
                 throw new BadRequestException("Сумма списания больше баланса кошелька с id " + wallet.getId());
             }
-            log.info("Списание средств в размере {} с кошелька с id {}", amount, wallet.getId());
-            withdrawMoney(wallet, amount);
+            log.info("Расчет баланса после списания {} с кошелька с id {}", amount, wallet.getId());
+            newBalance =  wallet.getBalance().subtract(amount);
         }
-    }
 
-    private void depositMoney(Wallet wallet, BigDecimal amount) {
-        BigDecimal newAmount = wallet.getBalance().add(amount);
-        wallet.setBalance(newAmount);
-        walletRepository.save(wallet);
-    }
-
-    private void withdrawMoney(Wallet wallet, BigDecimal amount) {
-        BigDecimal newAmount = wallet.getBalance().subtract(amount);
-        wallet.setBalance(newAmount);
-        walletRepository.save(wallet);
+        log.info("Сохранение нового баланса в размере {} кошелька с id {}", newBalance, wallet.getId());
+        walletRepository.updateBalance(newBalance, wallet.getId());
     }
 
     private WalletResponseDTO mapToDto(Wallet wallet) {
